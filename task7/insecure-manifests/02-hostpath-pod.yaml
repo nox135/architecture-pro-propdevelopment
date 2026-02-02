@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-hostpath
+  namespace: audit-zone
+  labels:
+    app: insecure-hostpath
+spec:
+  containers:
+    - name: nginx
+      image: nginx:1.20
+      volumeMounts:
+        - name: host-root
+          mountPath: /host
+        - name: host-docker
+          mountPath: /var/run/docker.sock
+      resources:
+        requests:
+          memory: "64Mi"
+          cpu: "250m"
+        limits:
+          memory: "128Mi"
+          cpu: "500m"
+  volumes:
+    - name: host-root
+      hostPath:
+        path: /
+        type: Directory
+    - name: host-docker
+      hostPath:
+        path: /var/run/docker.sock
+        type: Socket
+  restartPolicy: Never
