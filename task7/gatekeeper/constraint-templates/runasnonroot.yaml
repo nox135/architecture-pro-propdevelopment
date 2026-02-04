@@ -1,0 +1,21 @@
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: noroot
+spec:
+  crd:
+    spec:
+      names:
+        kind: NoRoot
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package no_root
+
+        violation[{"msg": msg}] {
+          input.request.namespace == ["audit-zone"]
+          input.request.object.spec.securityContext.runAsUser == 0
+          input.request.object.spec.securityContext.runAsGroup == 0
+          input.request.object.spec.securityContext.readOnlyRootFilesystem == true
+          msg := "Root not allowed."
+        }
